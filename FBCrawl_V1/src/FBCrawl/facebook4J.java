@@ -13,14 +13,14 @@ import facebook4j.conf.ConfigurationBuilder;
 public class facebook4J{
     private static final long serialVersionUID = -7453606094644144082L;
 
-    public void IDretrieval() throws FileNotFoundException, UnsupportedEncodingException, FacebookException {
+    public void IDretrieval(String filename) throws FileNotFoundException, UnsupportedEncodingException, FacebookException {
       
        
         ConfigurationBuilder cb = new ConfigurationBuilder();
         cb.setDebugEnabled(true)
           .setOAuthAppId("657861844318963")
           .setOAuthAppSecret("52ff9596f18ed0ee9ae7992fee481246")
-          .setOAuthAccessToken("CAACEdEose0cBAN69kwZChFAYrBhtLzZAiz9OyuLfQkguTpF6CUeSqRadPmzIOilqZA7qa8NxjcOID3kIP9ZCSpXuuGOmH5JvBBuXkGtBA943ZCSbSZCuT5Qlw0JgS6qX1bKIrWCJk8TzPZAJHwxPZBO2uX0mtfxkHqfEhJEz4F1VHkUqpOUzYaRTATBTs1pALqfsZCRrV0dRrbZB8pRTd4IdaoMDKx00hiWO4ZD")
+          .setOAuthAccessToken("CAACEdEose0cBADrrJZCpax6342r56Br361owMDaBSCrr8xQQvGoO1nTkqVd3e1rxsbPmMQtD79WX58XueyEmsvqR7uKIuJq1XuEKtO70y2fzthZBpRcfJgzXE6n6IBywfHZBDXt0k90KPMkdBY8vC2KISBlUgHs3IdqWobbvqYTkgPdZBT1LZAiaohTdFcz67CoE2e90iyT4giw8DAaDE84NDcS5IY98ZD")
           .setOAuthPermissions("email,publish_stream");
         FacebookFactory ff = new FacebookFactory(cb.build());
         Facebook facebook = ff.getInstance();
@@ -33,7 +33,7 @@ public class facebook4J{
 		int help = 0;
 		int i=0;
 		
-		PrintWriter writer = new PrintWriter("EventIDs.txt", "UTF-8");
+		PrintWriter writer = new PrintWriter(filename, "UTF-8");
 		
 		while(lowerBoundary < 1425440000 ){
 			 lowerBoundaryString = Integer.toString(lowerBoundary);

@@ -40,14 +40,24 @@ public class fbCrawl {
 		//		http.sendGet(new_accesstoken);
 		
 		//second try from the scratch
+		String[] query;
+	     query = new String[5];
+	     query[0] = "Amsterdam";
+	     query[1] = "Amsterdam";
+	     
+		
+		
+		String file_name= query[0]+".txt";
+		
 		
 		facebook4J IDs = new facebook4J();
-		IDs.IDretrieval();
+		IDs.IDretrieval(file_name);
 		
 		//Initialize index
 		HelloLuceneSimon hls = new HelloLuceneSimon();
 		
-		String file_name="EventIDs.txt";
+		
+		
 
 		BufferedReader br = new BufferedReader(new FileReader(file_name));
 		String line = null;
@@ -58,11 +68,7 @@ public class fbCrawl {
 		br.close();		
 		
 		
-		String[] query;
-	     query = new String[5];
-	     query[0] = "Amsterdam";
-	     query[1] = "Amsterdam";
-	     
+		
 	    hls.close();	
 		hls.search(query);
 		
