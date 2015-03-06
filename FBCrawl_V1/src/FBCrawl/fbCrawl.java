@@ -2,19 +2,40 @@ package FBCrawl;
 //import java.io.BufferedReader;
 //import java.io.DataOutputStream;
 //import java.io.InputStreamReader;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.ObjectOutputStream;
+import java.io.PrintStream;
 import java.io.Reader;
+import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.text.ParseException;
+import java.util.Date;
+import java.util.Map;
 
 import org.apache.lucene.document.Document;
 import org.apache.lucene.index.DirectoryReader;
 import org.apache.lucene.index.IndexReader;
+import org.apache.lucene.index.Term;
+import org.apache.lucene.queryparser.classic.QueryParser;
+import org.apache.lucene.search.IndexSearcher;
+import org.apache.lucene.search.Query;
+import org.apache.lucene.search.ScoreDoc;
+import org.apache.lucene.search.TermQuery;
+import org.apache.lucene.search.TopScoreDocCollector;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
+import org.apache.lucene.util.Version;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -22,69 +43,41 @@ import org.json.JSONObject;
 //import static org.junit.Assert.*;
 import org.json.simple.JSONValue;
 
+import facebook4j.FacebookException;
+
  
 public class fbCrawl {
  
-	private final String USER_AGENT = "Mozilla/5.0";
+	private final static String USER_AGENT = "Mozilla/5.0";
 	public final String INDEX_PATH = "";
    public String jsonFilePath = "/Users/Simon/git/FBCrawl_v2/FBCrawl_V1/src/test.txt";
  public JSONObject json;
+ public static String new_accesstoken = "";
 
 	public static void main(String[] args) throws Exception {
-		//initialise object, get accesstoken to access facebook
 		fbCrawl http = new fbCrawl();
-         String new_accesstoken = http.getAccessToken();
+		JButtonDemo2 application = new JButtonDemo2(http); 
+		
+		
+		
+		
+		
+         new_accesstoken = getAccessToken();
 		System.out.println("Testing 1 - Send Http GET request\n");
 		
 		//first try, copied from internet, doesn't reall work
 		//		http.sendGet(new_accesstoken);
 		
 		//second try from the scratch
-		String[] query;
-	     query = new String[5];
-	     query[0] = "Amsterdam";
-	     query[1] = "Amsterdam";
-	     
-		
-		
-		String file_name= query[0]+".txt";
-		
-		
-		facebook4J IDs = new facebook4J();
-		IDs.IDretrieval(file_name);
+
 		
 		//Initialize index
-		HelloLuceneSimon hls = new HelloLuceneSimon();
-		
-		
-		
-
-		BufferedReader br = new BufferedReader(new FileReader(file_name));
-		String line = null;
-		while ((line = br.readLine()) != null) {
-			http.GetAndAddToIndex(new_accesstoken, hls, line);
-		}
-	 
-		br.close();		
-		
-		
-		
-	    hls.close();	
-		hls.search(query);
 		
 	
 		
-		
-		//http.testWriteIndex();
-		
-		
-	
-		//System.out.println("\nTesting 2 - Send Http POST request");
-		//http.sendPost();
- 
 	}
 
-	public String getAccessToken() throws Exception {
+	public static String getAccessToken() throws Exception {
 
 			String url = "https://graph.facebook.com/oauth/access_token?grant_type=client_credentials&client_id=572563469546265&client_secret=352d672c3e2830660e00a1e39a5a2116";
 			URL obj = new URL(url);
@@ -194,12 +187,14 @@ public class fbCrawl {
 		System.out.println("\nSending 'GET' request to URL : " + url);
 		System.out.println("Response Code : " + responseCode);
 		
-		BufferedReader streamReader = new BufferedReader(new InputStreamReader(con.getInputStream(), "UTF-8"));
-		StringBuilder responseStrBuilder = new StringBuilder();
+		   BufferedReader streamReader = new BufferedReader(new InputStreamReader(con.getInputStream(), "UTF-8"));
+		    StringBuilder responseStrBuilder = new StringBuilder();
 
 		    String inputStr;
 		    while ((inputStr = streamReader.readLine()) != null)
 		        responseStrBuilder.append(inputStr);
+		    
+		    
 		    Reader readerJson = new InputStreamReader(con.getInputStream(), "UTF-8");
 		    Object fileObjects= JSONValue.parse(readerJson);
 		    JSONObject jsonObject = new JSONObject(responseStrBuilder.toString());
@@ -258,7 +253,40 @@ public class fbCrawl {
     	    
 
 }
-  
+    public void readIDs(String input, long timeFrom, long timeTo) throws FileNotFoundException, UnsupportedEncodingException, FacebookException{
+    	facebook4J IDs = new facebook4J();
+		String[] query;
+	     query = new String[5];
+	     query[0] = input;
+	     query[1] = "Amsterdam";
+	     
+	     System.out.println(query[0]);
+	     
+		String file_name= query[0];
+		IDs.IDretrieval(file_name, timeFrom, timeTo);
+    }
+    
+    
+   
+	
+	
+	
+    public void crawlAndIndex(String file_name) throws Exception{
+    	
+    	 HelloLuceneSimon hls = new HelloLuceneSimon();
+	BufferedReader br = new BufferedReader(new FileReader(file_name));
+	String line = null;
+	while ((line = br.readLine()) != null) {
+		GetAndAddToIndex(new_accesstoken, hls, line);
+	}
+ 
+	br.close();		
+	
+	
+	
+    hls.close();	
+	//hls.search(query);
+    }
 }
 //private static String readAll(Reader rd) throws IOException {
 //    StringBuilder sb = new StringBuilder();

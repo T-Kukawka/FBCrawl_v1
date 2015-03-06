@@ -5,10 +5,8 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 import java.net.URL;
-import java.sql.Date;
+import java.util.Date;
 import java.util.ListIterator;
-
-import com.sun.jmx.snmp.Timestamp;
 
 import facebook4j.*;
 import facebook4j.conf.ConfigurationBuilder;
@@ -16,45 +14,48 @@ import facebook4j.conf.ConfigurationBuilder;
 public class facebook4J{
     private static final long serialVersionUID = -7453606094644144082L;
 
-    public void IDretrieval(String query) throws FileNotFoundException, UnsupportedEncodingException, FacebookException {
+    public void IDretrieval(String query, long timeFrom, long timeTo) throws FileNotFoundException, UnsupportedEncodingException, FacebookException {
       
        
         ConfigurationBuilder cb = new ConfigurationBuilder();
         cb.setDebugEnabled(true)
           .setOAuthAppId("657861844318963")
           .setOAuthAppSecret("52ff9596f18ed0ee9ae7992fee481246")
-          .setOAuthAccessToken("CAACEdEose0cBAOJOI3TWoGXUwG2FKZCpYKOLCksO5Hoilf4ZCXrf1TEcB2ZB8w6mNT4ACSZCXkO6nP6vhdnTZCwL4zxIF4VnRhbXZBuePfK5fjn4ui8W9svoQhrvXPx3ymuzAEaFsFxlDXQBbMAhGtZBlFDTligKoXRf17pLIb1B5RH66yZBPLz5QqbI5ZCitGFTF6CVE52QjyOlLzyUWpsp7hqOLJZAXZAkCcZD")
+          .setOAuthAccessToken("CAACEdEose0cBAJcsiJMZAhvkmnNZCYV7G9qxQ4oVW80GUO7JSZCsdd8i5bEXfM0UcD7s8IqxJuDtbG0BQBGWDtBKh9vZCTQHjnZBOqtL6ZBLdYdrr1GSxSxC4nr842ZATCZCVFJBhSLBgJjSra5iIesHMrwJ0L4jbcVVWbvJaK0WczOcsJifCJ65yLIIQGsNry7P3g6J2XouevM4BT6sAuKwo7trYx81NZBcZD")
           .setOAuthPermissions("email,publish_stream");
         FacebookFactory ff = new FacebookFactory(cb.build());
         Facebook facebook = ff.getInstance();
         
-    	int lowerBoundary = 1325462400;
-		int upperBoundary = lowerBoundary + 86400;
+    	int lowerBoundary = (int) timeFrom;
+		int endDate = (int) timeTo;
 		ResponseList<Event> results;
 		String lowerBoundaryString;
-		String upperBoundaryString;
+		String ImplEndDate;
 		int help = 0;
 		int i=0;
 		long tsEvent = 0;
 		int EventCounter = 0;
-		
+		java.util.Date newlastEventDate = null;
+		long newlastEvent = 0;
+		long oldlastEvent = 0;
 		String file_name= query+".txt";
 		PrintWriter writer = new PrintWriter(file_name, "UTF-8");
 		
-		while(lowerBoundary <= 1423008000 ){
-			 lowerBoundaryString = Integer.toString(lowerBoundary);
-			 //upperBoundaryString = Integer.toString(upperBoundary);
+		while(endDate > lowerBoundary){
+			System.out.println("end:" +endDate);
+			System.out.println("lower:"+lowerBoundary);
+			ImplEndDate = Integer.toString(endDate);
+			// upperBoundaryString = Integer.toString(upperBoundary);
 			 
-	   System.out.println("timestamp: "+lowerBoundaryString);
-        results = facebook.searchEvents(query, new Reading().since(lowerBoundaryString));
+			 System.out.println("timestamp: "+ImplEndDate);
+		        results = facebook.searchEvents(query, new Reading().until(ImplEndDate));
         boolean a = true;
-        System.out.println(results.isEmpty());
-        System.out.println(results.size());
-        System.out.println(results.getCount());
+
         if( a == results.isEmpty()){
         	System.out.println("we're screwed");
+        	break;
         }
-        else {;
+        else {
         
         
         //My creation
@@ -68,69 +69,28 @@ public class facebook4J{
         	EventCounter++;
         }
         
-        java.util.Date lastEvent = results.get((i2-1)).getStartTime();
-    
-        tsEvent = new Long(lastEvent.getTime()/1000L);
+        
+        Date lastEvent = results.get(i2-1).getStartTime();
+        tsEvent = new Long(lastEvent.getTime()/1000);
         System.out.println("last timestamp:"+tsEvent);
+        writer.println("last timestamp :"+tsEvent);
+        endDate = (int) tsEvent;
         
-        
-        
-        
-        
-        
-        
-        
-       // int counter = 0;
-
-      
-//        while( counter < 4){ 
-//      
-//        writer.println(results.get(counter).getId());
-//        System.out.println(results.get(counter).getId());
-//        //ListIterator<Event> list = results.listIterator();
-//        counter++;
-//        }
-   
         }
+        System.out.println("done");
+        writer.println("Number of ids:" +EventCounter);
+		writer.close();
+        
         i++;
-    
-        lowerBoundary = (int)tsEvent;
+        
+        
         //upperBoundary = lowerBoundary + 86400;
         help++;
         }
-		writer.println("Number of ids:" +EventCounter);
-		writer.close();
+        
+	
 		
-		
-//        int i = results.getCount();
-     
-//int i = 0;
 
-//     while (i < results.size()){
-//    	 eventID = results.get(i).getId();
-//    	 System.out.println(eventID);
-//    	 i++;
-//     }
-     System.out.println("page1done");
-     System.out.println(EventCounter);
-     
-//      Paging<Event> page1 = results.getPaging();
-////      ResponseList<Event> page2 = facebook.fetchNext(page1);
-//      ResponseList<Event> page0 = facebook.fetchPrevious(page1);
-//      
-////      i = 0;
-////      while (i < page2.size()){
-////     	 eventID = page2.get(i).getId();
-////     	 System.out.println(eventID);
-////     	 i++;
-////      }
-//      i = 0;
-//      while (i < page0.size()){
-//      	 eventID = page0.get(i).getId();
-//      	 System.out.println(eventID);
-//      	 i++;
-//       }
-//      System.out.println("page0done");
                
     }
 }

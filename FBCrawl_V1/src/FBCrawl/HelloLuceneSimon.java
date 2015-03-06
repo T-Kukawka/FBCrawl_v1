@@ -69,8 +69,8 @@ Directory index = null;
     	Document doc = new Document();
     	//add string 1
     	
-		//doc.add(new TextField("description", jsonObject.getString("description"), Field.Store.YES));
-		//System.out.println(jsonObject.getString("description"));
+		doc.add(new TextField("description", jsonObject.getString("description"), Field.Store.YES));
+		System.out.println(jsonObject.getString("description"));
 		//add string 2
 		doc.add(new TextField("id", jsonObject.getString("id"), Field.Store.YES));
 		// use a string field for isbn because we don't want it tokenized
@@ -93,9 +93,10 @@ Directory index = null;
     	// the "title" arg specifies the default field to use
     	// when no field is explicitly specified in the query.
     	String querystr = searchTerm.length > 0 ? searchTerm[0] : "lucene";
+    	
     	Query q = null;
     	try {
-    		q = new QueryParser(Version.LUCENE_40, "name", analyzer).parse(querystr);
+    		q = new QueryParser(Version.LUCENE_40, "description", analyzer).parse(querystr);
     	} catch (org.apache.lucene.queryparser.classic.ParseException e) {
     		e.printStackTrace();
     	}
@@ -127,12 +128,27 @@ Directory index = null;
     
     public void readFromFile() throws IOException{
     	
-    	
-      	
+    	     	
       	 File path = new File("uniqueName");
        	Directory public_index = new MMapDirectory(path);
        	this.index = public_index;
       	
     	
     }
+    
+    public void deleteAndUpdate(String id) throws IOException{
+    	
+String querystr = id;
+    	
+    	Query q = null;
+    	try {
+    		q = new QueryParser(Version.LUCENE_40, "id", analyzer).parse(querystr);
+    	} catch (org.apache.lucene.queryparser.classic.ParseException e) {
+    		e.printStackTrace();
+    	}
+    	
+    	w.deleteDocuments(q);
+    }
+    
+    
 }
