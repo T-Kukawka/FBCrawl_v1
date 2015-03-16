@@ -1,19 +1,30 @@
 package FBCrawl;
 
 import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
-import java.net.URL;
 import java.util.Date;
-import java.util.ListIterator;
 
-import facebook4j.*;
+import facebook4j.Event;
+import facebook4j.Place;
+import facebook4j.Place.Location;
+import facebook4j.Venue;
+import facebook4j.Facebook;
+import facebook4j.FacebookException;
+import facebook4j.FacebookFactory;
+import facebook4j.Reading;
+import facebook4j.ResponseList;
 import facebook4j.conf.ConfigurationBuilder;
+import facebook4j.internal.org.json.JSONObject;
 
 public class facebook4J{
     private static final long serialVersionUID = -7453606094644144082L;
-
+    Integer[] idList = new Integer[10000];
+    
+    public Integer[] returnList(){
+    	return idList;
+    }
+    
     public void IDretrieval(String query, long timeFrom, long timeTo) throws FileNotFoundException, UnsupportedEncodingException, FacebookException {
       
        
@@ -21,15 +32,22 @@ public class facebook4J{
         cb.setDebugEnabled(true)
           .setOAuthAppId("657861844318963")
           .setOAuthAppSecret("52ff9596f18ed0ee9ae7992fee481246")
-          .setOAuthAccessToken("CAACEdEose0cBALVL2cSxWVFm5G9pUHE3W0qgoftbpfUJE0DZADqbgzQGdRd23ncnZCdKzkSjbXk1Xtu7F7d9jxslph6bX18rRw3mxZAe87ZC3ZBShWdhyCszcMNWFq3m1qbZCIihbTYuvevuuMqOdw7YgHH7Wqd4I1DlimsXR0yawjSLSqafbl1jOlo2Aszu4jH6HUFFVD0vh8ZCepSvW5rN2Ffn9GlFScZD")
+          .setOAuthAccessToken("CAACEdEose0cBAGWLkuPscZADTV4cr5bZBl4Jhx2jygtKaWZCA8iZAE4ZBwO38RFtZAquYEL7ZCc7hlcCrZCGdKBNHRZBR2HBO80o3qdslBS82LevOzxoz32nQ75PiqTmcZA1FaowWN2ZBZCDad00YgF5sZAZBWciw3gg6ZBugm3sslvvmHSF5EsZClGasWc8cUeY93E7udLZBYdM5dUqxFgDZBgv6OeRsm7VhmM2YXw98uXyeEZAswZCXAZDZD")
           .setOAuthPermissions("email,publish_stream");
         FacebookFactory ff = new FacebookFactory(cb.build());
         Facebook facebook = ff.getInstance();
+        
+        String location = null;
+        Location Secondlocation = null;
+        String PlaceLocation = null;
         
     	int lowerBoundary = (int) timeFrom;
     	int lastBoundary = 0;
 		int endDate = (int) timeTo;
 		ResponseList<Event> results;
+		ResponseList<Place> results2;
+		Double city;
+		String country;
 		String lowerBoundaryString;
 		String ImplEndDate;
 		int help = 0;
@@ -54,6 +72,7 @@ public class facebook4J{
 			 
 			 System.out.println("timestamp: "+ImplEndDate);
 		        results = facebook.searchEvents(query, new Reading().until(ImplEndDate));
+		        
         boolean a = true;
 
         if( a == results.isEmpty()){
@@ -62,14 +81,56 @@ public class facebook4J{
         }
         else {
         
-        
+        Boolean isLocation = true;
+    	
+       
         //My creation
         int i2=0;
         while(i2<results.size())
-        {
+        {	
+        	String CountryLocation = "";
         	String resultID = results.get(i2).getId();
-        	System.out.println(resultID);
-        	writer.println(resultID);
+        	idList[i2]=Integer.parseInt(resultID);
+        	
+        try{
+        
+        		location = results.get(i2).getLocation();
+        		
+        		if(location!=null){
+        		results2 = facebook.searchPlaces(location);
+            			
+        		PlaceLocation = results2.get(0).getLocation().getCity();
+    			CountryLocation = results2.get(0).getLocation().getCountry();
+        			if(CountryLocation!=null){
+		            	if(!CountryLocation.contains("")&&!CountryLocation.equals("Netherlands")){
+		            		isLocation =false;
+		            	}else{
+		            		isLocation = true;	
+		            	}
+            		}else if(PlaceLocation!=null){
+            			if(!PlaceLocation.contains("")&&!PlaceLocation.contains(query)){
+		            		isLocation =false;
+		            	}else{
+		            		isLocation = true;
+		            	}
+            		}
+            	}
+            	else{
+        			isLocation = false;
+        		}
+            	
+            	
+        		
+        	}catch(IndexOutOfBoundsException e){
+        		System.err.println();
+        	}
+        	if(isLocation){
+        		
+        		System.out.println(resultID+" "+location+" "+PlaceLocation);
+            	writer.println(resultID);
+            		
+        	}
+   
         	i2++;
         	EventCounter++;
         }
