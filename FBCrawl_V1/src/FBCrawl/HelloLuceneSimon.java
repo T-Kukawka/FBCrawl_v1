@@ -93,7 +93,7 @@ public class HelloLuceneSimon implements Comparable {
     
     }
     
-    public String[][] search(String[] input2) throws IOException{
+    public String[][] search(String[] input,String[] input2) throws IOException{
     	
     	String[][] results = new String[100][100];
     	// the "title" arg specifies the default field to use
@@ -106,34 +106,22 @@ public class HelloLuceneSimon implements Comparable {
     	} catch (org.apache.lucene.queryparser.classic.ParseException e) {
     		e.printStackTrace();
     	}
+    	
+    	String querystr2 = input.length > 0 ? input[0] : "lucene";
+    	
+    	Query q2 = null;
+    	try {
+    		q2 = new QueryParser(Version.LUCENE_40, "description", analyzer).parse(querystr2);
+    	} catch (org.apache.lucene.queryparser.classic.ParseException e) {
+    		e.printStackTrace();
+    	}
 //
     	// 3. searchx§
-    	int hitsPerPage = 100;
+    	int hitsPerPage = 100000;
     	IndexReader reader = DirectoryReader.open(this.index);
     	IndexSearcher searcher = new IndexSearcher(reader);
     	TopScoreDocCollector collector = TopScoreDocCollector.create(hitsPerPage, true);
-    	
-    	searcher.search(q, collector);
-       	
-    	System.out.println(q);
-    	ScoreDoc[] scoreDocs = collector.topDocs().scoreDocs;
-    	System.out.println("Found " + scoreDocs.length + " hits.");
-    	
-    	
-		for (int i = 0; i < scoreDocs.length; ++i) {
-			
-			int docId = scoreDocs[i].doc;
-		
-			Document d = searcher.doc(docId);
-			
-			//System.out.println((i + 1) + ". " + d.get("id") + "\t" + d.get("name") + d.get("attending_count") + "\t" + d.get("attending_count") + "\t"+ d.get("declined_count") + "\t"+ d.get("invited_count") + "\t"+ d.get("start_time") + "\t");
-			
-			
-			
-		}
-		
-		
-		
+    
 		Sort sorter = new Sort(); // new sort object
 
     	String field = "attending_count"; 
@@ -144,19 +132,43 @@ public class HelloLuceneSimon implements Comparable {
     	sorter.setSort(sortField, SortField.FIELD_SCORE);
     	
 		
+    	
 		System.out.println("Sorted");    	
 		TopFieldDocs docs = searcher.search(q,20, sorter);
 		ScoreDoc[] hits= docs.scoreDocs;
 
+		
+		IndexReader reader2 = DirectoryReader.open(this.index);
+    	IndexSearcher searcher2 = new IndexSearcher(reader2);
+    	TopScoreDocCollector collector2 = TopScoreDocCollector.create(hitsPerPage, true);
+    	ScoreDoc[] scoreDocs2 = collector.topDocs().scoreDocs;
+    	
+    	searcher2.search(q2, collector2);
+    	System.out.println(scoreDocs2.length);
+		
 		for (int j=0; j < hits.length; j++) {
 			int docId = hits[j].doc;
-		
 			Document d = searcher.doc(docId);
 			results[j][0]=d.get("id");
 			results[j][1]= d.get("name");
 			results[j][2]= d.get("attending_count");
 			results[j][3]= d.get("start_time");
 			results[j][4]= d.get("location");
+			
+			for(int i2=0; i2< scoreDocs2.length; i2++){
+				int docId2 = scoreDocs2[i2].doc;
+				Document d2 = searcher2.doc(docId2);
+				System.out.println(d.get("id")+" "+d2.get("id"));
+				if(d.get("id").equals(d2.get("id"))){
+					
+					results[j][0]=d.get("id");
+					results[j][1]= d.get("name");
+					results[j][2]= d.get("attending_count");
+					results[j][3]= d.get("start_time");
+					results[j][4]= d.get("location");
+				}
+			
+			}
 			
 		}
 		System.out.println("yep");

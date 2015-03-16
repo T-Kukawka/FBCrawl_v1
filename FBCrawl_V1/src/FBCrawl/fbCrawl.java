@@ -277,11 +277,13 @@ public class fbCrawl {
 		IDs.IDretrieval(file_name, timeFrom, timeTo);
     }
     
-    public String[][] search(String input)throws FacebookException, IOException, ParseException{
+    public String[][] search(String input, String input2)throws FacebookException, IOException, ParseException{
     	HelloLuceneSimon hls = new HelloLuceneSimon();
     	String[] searchTerm = new String[1];
     	searchTerm[0] = input;
-	     String[][] results= hls.search(searchTerm);
+    	String[] searchTerm2 = new String[1];
+    	searchTerm2[0] = input2;
+	     String[][] results= hls.search(searchTerm, searchTerm2);
 	     
 	     hls.close();
 	   return results;

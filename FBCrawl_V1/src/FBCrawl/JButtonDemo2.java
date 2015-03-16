@@ -28,11 +28,12 @@ import facebook4j.FacebookException;
     	JTextField jtfInput, jtfInput2; 
     	Integer[][] eventCount = new Integer[100][100];
     	Integer[][] shortCount = new Integer[100][100];
-    	String[][] allEvents = new String[100][100];
-    	String[][]	sortedEvents = new String[100][100];
+    
     	int i5=0;
     	int j=0;
     	int index=0;
+		
+    	
     	
     	JPanel jplPanel;
     	
@@ -134,15 +135,17 @@ import facebook4j.FacebookException;
             
             jbnButton3.addActionListener(new ActionListener() {
             	public void actionPerformed(ActionEvent e) {
-            		
-            		String search_term = jtfInput2.getText();
-            		
+            		String search_term = jtfInput.getText();
+            		String search_term2 = jtfInput2.getText();
+            		String[][] allEvents = new String[100][100];
+                	final String[][]	sortedEvents = new String[100][100];
+                	index = 0;
             		int date = shortCount[List.getSelectedIndex()][0];
             		System.out.println(date);
             		
             		
             		try {
-            			allEvents = fbCrawl.search(search_term);
+            			allEvents = fbCrawl.search(search_term, search_term2);
 					}
 					 catch (Exception e1) {
 						// TODO Auto-generated catch block
@@ -157,11 +160,18 @@ import facebook4j.FacebookException;
             			j++;
             		}
             		
+            		if(index==0){
+            			index=1;
+            			sortedEvents[0][0]="There are no events in "+search_term+" on this date containing  the search word";
+            			sortedEvents[0][1]="";
+            		}
+            		
             		List2.setModel(new javax.swing.AbstractListModel() {
             			  public int getSize() { 
             				  return (index); }
+            			  
                         public Object getElementAt(int i) { 
-                      	  return sortedEvents[i][0]+" "+sortedEvents[i][1]+" events"; 
+                      	  return sortedEvents[i][0]+" "+sortedEvents[i][1]; 
                         	}
                     });
             	}

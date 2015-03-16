@@ -19,7 +19,7 @@ import facebook4j.internal.org.json.JSONObject;
 
 public class facebook4J{
     private static final long serialVersionUID = -7453606094644144082L;
-    Integer[] idList = new Integer[10000];
+    Integer[] idList = new Integer[50000];
     
     public Integer[] returnList(){
     	return idList;
