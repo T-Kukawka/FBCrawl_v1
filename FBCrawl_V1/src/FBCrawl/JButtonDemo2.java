@@ -32,7 +32,9 @@ import facebook4j.FacebookException;
     	int i5=0;
     	int j=0;
     	int index=0;
-		
+    	String[][] allEvents = new String[100][100];
+    	String[][] sortedEvents = new String[100][100];
+    	
     	
     	
     	JPanel jplPanel;
@@ -137,35 +139,33 @@ import facebook4j.FacebookException;
             	public void actionPerformed(ActionEvent e) {
             		String search_term = jtfInput.getText();
             		String search_term2 = jtfInput2.getText();
-            		String[][] allEvents = new String[100][100];
-                	final String[][]	sortedEvents = new String[100][100];
+            		
+                	
                 	index = 0;
-            		int date = shortCount[List.getSelectedIndex()][0];
+            		String date = Integer.toString(shortCount[List.getSelectedIndex()][0]);
             		System.out.println(date);
             		
             		
             		try {
-            			allEvents = fbCrawl.search(search_term, search_term2);
+            			allEvents = fbCrawl.search(search_term, search_term2, date);
 					}
 					 catch (Exception e1) {
 						// TODO Auto-generated catch block
 						e1.printStackTrace();
 					}
-            		while (allEvents[j][0]!=null){
-            			if(allEvents[j][3].equals(Integer.toString(date))){
-            				sortedEvents[j]=allEvents[j];
-            				index++;
-            				
-            			}
-            			j++;
-            		}
             		
-            		if(index==0){
-            			index=1;
-            			sortedEvents[0][0]="There are no events in "+search_term+" on this date containing  the search word";
-            			sortedEvents[0][1]="";
-            		}
-            		
+            		int i=0;
+            		try{
+	            		while(allEvents[i][0]!=null){
+	            			sortedEvents[i][0]=allEvents[i][0];
+	            			sortedEvents[i][1]=allEvents[i][1];
+	            			i++;
+	            		}
+            		}catch(ArrayIndexOutOfBoundsException e2)
+            		{
+            			
+            		}            		
+            		index=i;
             		List2.setModel(new javax.swing.AbstractListModel() {
             			  public int getSize() { 
             				  return (index); }

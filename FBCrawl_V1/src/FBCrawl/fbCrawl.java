@@ -164,7 +164,7 @@ public class fbCrawl {
 //	//	testWriteIndex();
 //	}
 	
-	private void GetAndAddToIndex(String new_accesstoken, HelloLuceneSimon hls, String id) throws Exception {
+	private void GetAndAddToIndex(String new_accesstoken, HelloLuceneSimon hls, String id, String location) throws Exception {
 		//get data from fb
 		String inputLine;
 		String url = "https://graph.facebook.com/";
@@ -175,7 +175,7 @@ public class fbCrawl {
  
 		URL obj = new URL(url);
 		HttpURLConnection con = (HttpURLConnection) obj.openConnection();
- 
+		
 		// optional default is GET
 		con.setRequestMethod("GET");
  
@@ -213,7 +213,7 @@ public class fbCrawl {
 		    
 		try {
 
-		hls.addDocument(jsonObject, arrayObjects); 
+		hls.addDocument(jsonObject, arrayObjects, location); 
 		   } catch (Exception e) {
 	            e.printStackTrace();
 	        }
@@ -253,7 +253,7 @@ public class fbCrawl {
     
 }
     
-    public Integer[][] countDailyEvents(String input,String SelectedFrom, String SelectedTo) throws FacebookException, IOException, ParseException{
+    public Integer[][] countDailyEvents(String input,String SelectedFrom, String SelectedTo) throws FacebookException, IOException, ParseException, org.apache.lucene.queryparser.classic.ParseException{
 	   	HelloLuceneSimon hls = new HelloLuceneSimon();
 	   	String[] searchTerm = new String[1];
 	   	searchTerm[0] = input;
@@ -277,13 +277,13 @@ public class fbCrawl {
 		IDs.IDretrieval(file_name, timeFrom, timeTo);
     }
     
-    public String[][] search(String input, String input2)throws FacebookException, IOException, ParseException{
+    public String[][] search(String input, String input2, String date)throws FacebookException, IOException, ParseException, org.apache.lucene.queryparser.classic.ParseException{
     	HelloLuceneSimon hls = new HelloLuceneSimon();
     	String[] searchTerm = new String[1];
     	searchTerm[0] = input;
     	String[] searchTerm2 = new String[1];
     	searchTerm2[0] = input2;
-	     String[][] results= hls.search(searchTerm, searchTerm2);
+	     String[][] results= hls.search(searchTerm, searchTerm2, date);
 	     
 	     hls.close();
 	   return results;
@@ -298,8 +298,15 @@ public class fbCrawl {
     	HelloLuceneSimon hls = new HelloLuceneSimon();
 	BufferedReader br = new BufferedReader(new FileReader(file_name));
 	String line = null;
+	String location = null;
+	int index=0;
 	while ((line = br.readLine()) != null) {
-		GetAndAddToIndex(new_accesstoken, hls, line);
+		if(index==0){
+			location = line;
+		}else{
+			GetAndAddToIndex(new_accesstoken, hls, line, location);
+		}
+		index++;
 	}
  
 	br.close();		

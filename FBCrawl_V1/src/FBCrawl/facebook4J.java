@@ -19,9 +19,9 @@ import facebook4j.internal.org.json.JSONObject;
 
 public class facebook4J{
     private static final long serialVersionUID = -7453606094644144082L;
-    Integer[] idList = new Integer[50000];
+    Long[] idList = new Long[50000];
     
-    public Integer[] returnList(){
+    public Long[] returnList(){
     	return idList;
     }
     
@@ -32,7 +32,7 @@ public class facebook4J{
         cb.setDebugEnabled(true)
           .setOAuthAppId("657861844318963")
           .setOAuthAppSecret("52ff9596f18ed0ee9ae7992fee481246")
-          .setOAuthAccessToken("CAACEdEose0cBAGWLkuPscZADTV4cr5bZBl4Jhx2jygtKaWZCA8iZAE4ZBwO38RFtZAquYEL7ZCc7hlcCrZCGdKBNHRZBR2HBO80o3qdslBS82LevOzxoz32nQ75PiqTmcZA1FaowWN2ZBZCDad00YgF5sZAZBWciw3gg6ZBugm3sslvvmHSF5EsZClGasWc8cUeY93E7udLZBYdM5dUqxFgDZBgv6OeRsm7VhmM2YXw98uXyeEZAswZCXAZDZD")
+          .setOAuthAccessToken("CAACEdEose0cBAFIZBja0zpcHuZC3BxyTtbv0wRHPNeveYAf2Ce9vul04jjlTflX2aoOUxDuU22sW9h2AODNT6vZCVv5cxoXRtZA5PCKuDW2u8K3242KACPZAwRgFdurlQjOQftsy9Lvp25KqoZC167WjBjYtDmjaKnuZCL3ckonZA8EN2BiAsaEoNMJsGOVNPzt7BBHHZC4QKCHjNDaOBU4lsfCL7ZAH2itZCnn8GW6HbFIVAZDZD")
           .setOAuthPermissions("email,publish_stream");
         FacebookFactory ff = new FacebookFactory(cb.build());
         Facebook facebook = ff.getInstance();
@@ -59,6 +59,7 @@ public class facebook4J{
 		long oldlastEvent = 0;
 		String file_name= query+timeFrom+timeTo+".txt";
 		PrintWriter writer = new PrintWriter(file_name, "UTF-8");
+		writer.println(query);
 		
 		while(endDate > lowerBoundary){
 			if(lowerBoundary == lastBoundary){
@@ -90,7 +91,7 @@ public class facebook4J{
         {	
         	String CountryLocation = "";
         	String resultID = results.get(i2).getId();
-        	idList[i2]=Integer.parseInt(resultID);
+        	idList[i2]=Long.parseLong(resultID);
         	
         try{
         
