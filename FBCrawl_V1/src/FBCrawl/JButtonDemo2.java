@@ -28,7 +28,9 @@ import facebook4j.FacebookException;
     	JTextField jtfInput, jtfInput2; 
     	Integer[][] eventCount = new Integer[100][100];
     	Integer[][] shortCount = new Integer[100][100];
-    
+    	JLabel Search1, DatePicker;
+		JLabel results, search2, results2;
+    	
     	int i5=0;
     	int j=0;
     	int index=0;
@@ -37,7 +39,7 @@ import facebook4j.FacebookException;
     	
     	
     	
-    	JPanel jplPanel;
+    	JPanel jplPanel, jplPanel2,jplPanel3, jplPanel4, jplPanel25;
     	
     	public JButtonDemo2(final fbCrawl fbCrawl) throws IOException, ParseException {
         		
@@ -50,6 +52,10 @@ import facebook4j.FacebookException;
     		jtfInput = new JTextField(20);
     		jtfInput2 = new JTextField(20);
     		jplPanel = new JPanel();
+    		jplPanel2 = new JPanel();
+    		jplPanel3 = new JPanel();
+    		jplPanel4 = new JPanel();
+    		jplPanel25 = new JPanel();
     		final JList List = new javax.swing.JList();
             JScrollPane ScrollPane = new javax.swing.JScrollPane();
             final JList List2 = new javax.swing.JList();
@@ -212,6 +218,7 @@ import facebook4j.FacebookException;
             			eventCount = fbCrawl.countDailyEvents(search_term, dateTo, dateFrom);
             			
             			try{
+            				
             			while(eventCount[i5][0]!=null){
             				shortCount[i5][0]=eventCount[i5][0];
             				shortCount[i5][1]=eventCount[i5][1];
@@ -238,22 +245,120 @@ import facebook4j.FacebookException;
             	
             });
             
-            
+            List.addMouseListener(new MouseAdapter() {
+            	String search_term = jtfInput.getText();
+            	int index;
+                public void mouseClicked(MouseEvent evt) {
+                	
+                    JList list = (JList)evt.getSource();
+                    if (evt.getClickCount() == 2) {
 
-    		jplPanel.setLayout(new BoxLayout(jplPanel, BoxLayout.PAGE_AXIS));
+                        // Double-click detected
+                        
+                		String date = Integer.toString(shortCount[List.getSelectedIndex()][0]);
+
+                        
+                        	
+                        	try {
+								allEvents = fbCrawl.search(search_term, search_term, date);
+							} catch (FacebookException e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
+							} catch (IOException e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
+							} catch (ParseException e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
+							} catch (org.apache.lucene.queryparser.classic.ParseException e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
+							}
+                        	int i=0;
+                    		try{
+        	            		while(allEvents[i][0]!=null){
+        	            			sortedEvents[i][0]=allEvents[i][0];
+        	            			sortedEvents[i][1]=allEvents[i][1];
+        	            			i++;
+        	            		}
+                    		}catch(ArrayIndexOutOfBoundsException e2)
+                    		{
+                    			
+                    		}            		
+                    		index=i;
+                    		List2.setModel(new javax.swing.AbstractListModel() {
+                    			  public int getSize() { 
+                    				  return (index); }
+                    			  
+                                public Object getElementAt(int i) { 
+                              	  return sortedEvents[i][0]+" "+sortedEvents[i][1]; 
+                                	}
+                            });
+                        	
+                        	
+                        
+                        
+                        
+                    } else if (evt.getClickCount() == 3) {
+
+                        // Triple-click detected
+                        int index = list.locationToIndex(evt.getPoint());
+                    }
+                }
+            });
+
+            Search1 = new JLabel("Type in city you are interested in", SwingConstants.CENTER);
+           // Search1.setText("Type in city you are interested in");
+            //Search1.setHorizontalAlignment(SwingConstants.RIGHT);
+            
+            
+            DatePicker = new JLabel("Pick up the time interval you want to investigate", SwingConstants.CENTER);
+            
+            
+            results = new JLabel("Pick up date to see all events", SwingConstants.CENTER);
+            
+            
+            search2 = new JLabel("Search for events in picked up date", SwingConstants.CENTER);
+            
+            
+            results2 = new JLabel("List of events", SwingConstants.CENTER);
+            
+            
+    		//jplPanel.setLayout(new BoxLayout(jplPanel, FlowLayout.CENTER));
+    		
+    		jplPanel.setLayout(new GridLayout(0, 1));
+    		jplPanel2.setLayout(new GridLayout(0, 1));
+    		jplPanel3.setLayout(new GridLayout(0, 1));
+    		jplPanel25.setLayout(new BoxLayout(jplPanel25, FlowLayout.CENTER));
+    		jplPanel4.setLayout(new BoxLayout(jplPanel4, FlowLayout.CENTER));
+    		
+    		jplPanel.add(Search1);
     		jplPanel.add(jtfInput);
     		jplPanel.add(jbnButton1); 
     		jplPanel.add(jbnButton2);
     		
     		jplPanel.add(jbnButton4);
-    		jplPanel.add(datePickerFrom);
-    		jplPanel.add(datePickerTo);
-    		jplPanel.add(ScrollPane);
-    		jplPanel.add(jtfInput2);
-    		jplPanel.add(jbnButton3);
-    		jplPanel.add(ScrollPane2);
+    		
+    		jplPanel2.add(DatePicker);
+    		jplPanel2.add(datePickerFrom);
+    		jplPanel2.add(datePickerTo);
+    		
+    		jplPanel2.add(results);
+    		jplPanel25.add(ScrollPane);
+
+    		jplPanel3.add(search2); 
+    		jplPanel3.add(jtfInput2);
+    		jplPanel3.add(jbnButton3);
+    		
+    		jplPanel3.add(results2);
+    		jplPanel4.add(ScrollPane2);
         		
-        	jtfMainFrame.getContentPane().add(jplPanel, BorderLayout.CENTER);
+    		jtfMainFrame.setLayout(new GridLayout(0,1));
+        	jtfMainFrame.getContentPane().add(jplPanel);
+        	jtfMainFrame.getContentPane().add(jplPanel2);
+        	jtfMainFrame.getContentPane().add(jplPanel25);
+        	jtfMainFrame.getContentPane().add(jplPanel3);
+        	jtfMainFrame.getContentPane().add(jplPanel4);
 
         	jtfMainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); 
         	jtfMainFrame.pack();

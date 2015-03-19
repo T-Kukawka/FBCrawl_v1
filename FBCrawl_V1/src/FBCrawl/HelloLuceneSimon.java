@@ -99,6 +99,7 @@ public class HelloLuceneSimon implements Comparable {
     public String[][] search(String[] input,String[] input2, String date) throws IOException, org.apache.lucene.queryparser.classic.ParseException{
     	
     	String[][] results = new String[100][100];
+    	String[] fields = new String[3];
     	// the "title" arg specifies the default field to use
     	// when no field is explicitly specified in the query.
 //    	String querystr = input2.length > 0 ? input2[0] : "lucene";
@@ -114,14 +115,21 @@ public class HelloLuceneSimon implements Comparable {
     	
     	
     	
-		 String[] fields = {"location","description","start_time"};
+		 
+		 fields[0]="location";
+		 fields[1]="description";
+		 fields[2]="start_time";
+		 
+		 if(input[0]==input2[0]){
+			 	fields[1]="location";
+		 }
     	 BooleanClause.Occur[] flags = {BooleanClause.Occur.MUST,
                  BooleanClause.Occur.MUST,
                  BooleanClause.Occur.MUST};
     	 Query query = MultiFieldQueryParser.parse(new String[] {input[0],input2[0],date}, fields, flags, analyzer);
     	
     	// 3. searchx§
-    	int hitsPerPage = 10000000;
+    	int hitsPerPage = 1000;
 //    	IndexReader reader = DirectoryReader.open(this.index);
 //    	IndexSearcher searcher = new IndexSearcher(reader);
 //    	TopScoreDocCollector collector = TopScoreDocCollector.create(hitsPerPage, true);
@@ -234,6 +242,9 @@ public class HelloLuceneSimon implements Comparable {
         	ScoreDoc[] scoreDocs = collector.topDocs().scoreDocs;
     		dateEventCount[days][0]=(i2+20150000);
     		dateEventCount[days][1]=scoreDocs.length;
+    		
+    		
+    		
     		
     		int operator = i2%1000;
 			int operator2 = operator%2;
