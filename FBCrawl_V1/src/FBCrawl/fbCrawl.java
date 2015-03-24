@@ -253,11 +253,13 @@ public class fbCrawl {
     
 }
     
-    public Integer[][] countDailyEvents(String input,String SelectedFrom, String SelectedTo) throws FacebookException, IOException, ParseException, org.apache.lucene.queryparser.classic.ParseException{
+    public Integer[][] countDailyEvents(String input,String input2, String SelectedFrom, String SelectedTo) throws FacebookException, IOException, ParseException, org.apache.lucene.queryparser.classic.ParseException{
 	   	HelloLuceneSimon hls = new HelloLuceneSimon();
 	   	String[] searchTerm = new String[1];
+	   	String[] searchTerm2 = new String[1];
 	   	searchTerm[0] = input;
-		     Integer[][] eventCount=hls.countDailyEvents(searchTerm, SelectedFrom, SelectedTo);
+	   	searchTerm2[0] = input2;
+		     Integer[][] eventCount=hls.countDailyEvents(searchTerm,searchTerm2, SelectedFrom, SelectedTo);
 		     hls.close();
 		     return eventCount;
 		   
@@ -284,6 +286,9 @@ public class fbCrawl {
     	String[] searchTerm2 = new String[1];
     	searchTerm2[0] = input2;
 	     String[][] results= hls.search(searchTerm, searchTerm2, date);
+	     
+	     facebook4J IDs = new facebook4J();
+	     IDs.EventsRetrieval(searchTerm, searchTerm2);
 	     
 	     hls.close();
 	   return results;

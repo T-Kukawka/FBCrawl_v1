@@ -25,6 +25,25 @@ public class facebook4J{
     	return idList;
     }
     
+    public void EventsRetrieval(String[] search_term, String[] search_term2) throws FacebookException{
+    	 ConfigurationBuilder cb = new ConfigurationBuilder();
+         cb.setDebugEnabled(true)
+           .setOAuthAppId("657861844318963")
+           .setOAuthAppSecret("52ff9596f18ed0ee9ae7992fee481246")
+           .setOAuthAccessToken("CAACEdEose0cBAPpr5PEKLJ573uEni8VGmhEIngZAO0BG8gFZADdVY1vI7IRve20UlWQZATWZAP5TCLM1s77HniT1rhuU2BzksXhIppabxIBbOci5hUD4vgDUn0Y8kZCDEtAEGEhgOI1tNcvOfSZCsa47SKGb0JbihHCfTKL8hBZBivEcfaUQjqlSb8wR0e3fZBLewAKezwPU2a6veyCDRWI3GIjmlMvNrvlfkQEyI8ul0wZDZD")
+           .setOAuthPermissions("email,publish_stream");
+         FacebookFactory ff = new FacebookFactory(cb.build());
+         Facebook facebook = ff.getInstance();
+         
+         String query = search_term[0]+" "+search_term2[0];
+    
+    	
+    	int counter = facebook.searchEvents(query).size();
+    	
+         System.out.println("Facebook event count: " +counter);
+    	
+    }
+    
     public void IDretrieval(String query, long timeFrom, long timeTo) throws FileNotFoundException, UnsupportedEncodingException, FacebookException {
       
        
@@ -32,20 +51,25 @@ public class facebook4J{
         cb.setDebugEnabled(true)
           .setOAuthAppId("657861844318963")
           .setOAuthAppSecret("52ff9596f18ed0ee9ae7992fee481246")
-          .setOAuthAccessToken("CAACEdEose0cBAFIZBja0zpcHuZC3BxyTtbv0wRHPNeveYAf2Ce9vul04jjlTflX2aoOUxDuU22sW9h2AODNT6vZCVv5cxoXRtZA5PCKuDW2u8K3242KACPZAwRgFdurlQjOQftsy9Lvp25KqoZC167WjBjYtDmjaKnuZCL3ckonZA8EN2BiAsaEoNMJsGOVNPzt7BBHHZC4QKCHjNDaOBU4lsfCL7ZAH2itZCnn8GW6HbFIVAZDZD")
+          .setOAuthAccessToken("CAACEdEose0cBAPpr5PEKLJ573uEni8VGmhEIngZAO0BG8gFZADdVY1vI7IRve20UlWQZATWZAP5TCLM1s77HniT1rhuU2BzksXhIppabxIBbOci5hUD4vgDUn0Y8kZCDEtAEGEhgOI1tNcvOfSZCsa47SKGb0JbihHCfTKL8hBZBivEcfaUQjqlSb8wR0e3fZBLewAKezwPU2a6veyCDRWI3GIjmlMvNrvlfkQEyI8ul0wZDZD")
           .setOAuthPermissions("email,publish_stream");
         FacebookFactory ff = new FacebookFactory(cb.build());
         Facebook facebook = ff.getInstance();
+        
+        String query2 = query.toUpperCase();
         
         String location = null;
         Location Secondlocation = null;
         String PlaceLocation = null;
         
+        int indexFB=0;
+        int indexEvEx=0;
     	int lowerBoundary = (int) timeFrom;
     	int lastBoundary = 0;
 		int endDate = (int) timeTo;
 		ResponseList<Event> results;
 		ResponseList<Place> results2;
+		ResponseList<Event> results3;
 		Double city;
 		String country;
 		String lowerBoundaryString;
@@ -63,20 +87,22 @@ public class facebook4J{
 		
 		while(endDate > lowerBoundary){
 			if(lowerBoundary == lastBoundary){
-				System.out.println("end");
+				//System.out.println("end");
 				break;
 			}else{
-			System.out.println("end:" +endDate);
-			System.out.println("lower:"+lowerBoundary);
+			//System.out.println("end:" +endDate);
+			//System.out.println("lower:"+lowerBoundary);
 			ImplEndDate = Integer.toString(endDate);
 			// upperBoundaryString = Integer.toString(upperBoundary);
 			 
-			 System.out.println("timestamp: "+ImplEndDate);
+			 //System.out.println("timestamp: "+ImplEndDate);
 		        results = facebook.searchEvents(query, new Reading().until(ImplEndDate));
+		        results3 = facebook.searchEvents(query);
+		        
 		        
         boolean a = true;
 
-        if( a == results.isEmpty()){
+        if( a == results.isEmpty() ){
         	System.out.println("we're screwed");
         	break;
         }
@@ -95,9 +121,15 @@ public class facebook4J{
         	
         try{
         
-        		location = results.get(i2).getLocation();
+        		String location2 = results.get(i2).getLocation();
         		
-        		if(location!=null){
+        		if(location2!=null){
+        		location = location2.toUpperCase();
+        		}else{
+        			location=location2;
+        		}
+        		if(location2!=null && !location.contains(query2)){
+        		 
         		results2 = facebook.searchPlaces(location);
             			
         		PlaceLocation = results2.get(0).getLocation().getCity();
@@ -109,42 +141,59 @@ public class facebook4J{
 		            		isLocation = true;	
 		            	}
             		}else if(PlaceLocation!=null){
-            			if(!PlaceLocation.contains("")&&!PlaceLocation.contains(query)){
+            			if(!PlaceLocation.contains("")&&!PlaceLocation.contains(query2)){
 		            		isLocation =false;
 		            	}else{
 		            		isLocation = true;
 		            	}
             		}
             	}
-            	else{
+            	else if(location!=null && location.contains(query2)  ){
+        			isLocation = true;
+        			
+        		}else{
         			isLocation = false;
         		}
             	
             	
         		
         	}catch(IndexOutOfBoundsException e){
-        		System.err.println();
+        		//System.err.println();
         	}
         	if(isLocation){
         		
-        		System.out.println(resultID+" "+location+" "+PlaceLocation);
-            	writer.println(resultID);
-            		
+        		//System.out.println(resultID+" "+location+" "+location.contains(query2));
+        		indexEvEx++;
+            	writer.println(resultID);		
         	}
-   
+        	
         	i2++;
-        	EventCounter++;
+        	
         }
+        
         
         
         Date lastEvent = results.get(i2-1).getStartTime();
         tsEvent = new Long(lastEvent.getTime()/1000);
-        System.out.println("last timestamp:"+tsEvent);
+        
         writer.println("last timestamp :"+tsEvent);
         endDate = (int) tsEvent;
         
         }
-        System.out.println("done");
+        
+        System.out.println("---------------------KPI 1.--------------------------------------");
+        System.out.println("Number of events with location filter: "+indexEvEx);
+        EventCounter=results3.size();
+        System.out.println("Number events returned by facebook api:" +EventCounter);
+        
+        float kpi1 = ((float)indexEvEx/EventCounter);
+        String str = String.format("%2.04f", kpi1);
+        System.out.println("KPI value:" + str);
+        
+        
+        
+        
+        
         writer.println("Number of ids:" +EventCounter);
 		writer.close();
         

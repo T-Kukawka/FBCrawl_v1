@@ -100,6 +100,7 @@ public class HelloLuceneSimon implements Comparable {
     	
     	String[][] results = new String[100][100];
     	String[] fields = new String[3];
+    	String[] fields2 = new String[2];
     	// the "title" arg specifies the default field to use
     	// when no field is explicitly specified in the query.
 //    	String querystr = input2.length > 0 ? input2[0] : "lucene";
@@ -119,7 +120,7 @@ public class HelloLuceneSimon implements Comparable {
 		 fields[0]="location";
 		 fields[1]="description";
 		 fields[2]="start_time";
-		 
+		
 		 if(input[0]==input2[0]){
 			 	fields[1]="location";
 		 }
@@ -127,9 +128,30 @@ public class HelloLuceneSimon implements Comparable {
                  BooleanClause.Occur.MUST,
                  BooleanClause.Occur.MUST};
     	 Query query = MultiFieldQueryParser.parse(new String[] {input[0],input2[0],date}, fields, flags, analyzer);
+    	 System.out.println(query);
+    	 
+    	 
+    	 
     	
+//    	 fields2[0]="description";
+//		 fields2[1]="description";
+//    	 BooleanClause.Occur[] flags2 = {BooleanClause.Occur.MUST,
+//                 BooleanClause.Occur.MUST};
+//    	 Query query2 = MultiFieldQueryParser.parse(new String[] {input[0],input2[0]}, fields2, flags2, analyzer);
+//    	 
+    	 int hitsPerPage = 1000;
+//    	 
+//    	 IndexReader reader3 = DirectoryReader.open(this.index);
+//     	IndexSearcher searcher3 = new IndexSearcher(reader3);
+//     	TopScoreDocCollector collector3 = TopScoreDocCollector.create(hitsPerPage, true);
+//     	
+//     	searcher3.search(query2, collector3);
+//     	ScoreDoc[] scoreDocs4= collector3.topDocs().scoreDocs;
+//	
+//     	System.out.println("Facebook's number of results for 2 search terms: "+scoreDocs4.length);
+//    	 
     	// 3. searchx§
-    	int hitsPerPage = 1000;
+    	
 //    	IndexReader reader = DirectoryReader.open(this.index);
 //    	IndexSearcher searcher = new IndexSearcher(reader);
 //    	TopScoreDocCollector collector = TopScoreDocCollector.create(hitsPerPage, true);
@@ -148,30 +170,40 @@ public class HelloLuceneSimon implements Comparable {
 //		System.out.println("Sorted");    	
 //		TopFieldDocs docs = searcher.search(q,20, sorter);
 //		ScoreDoc[] hits= docs.scoreDocs;
-
+    	 
+    	 
+    	 
 		
 		IndexReader reader2 = DirectoryReader.open(this.index);
     	IndexSearcher searcher2 = new IndexSearcher(reader2);
-    	TopScoreDocCollector collector2 = TopScoreDocCollector.create(hitsPerPage, true);
     	
-    	searcher2.search(query, collector2);
-    	ScoreDoc[] scoreDocs2 = collector2.topDocs().scoreDocs;
+    	Sort sorter = new Sort(); // new sort object
     	
-    	  
+    	String field = "attending_count"; 
+    	Type type = Type.INT;
+    	boolean descending = true; 
+       	SortField sortField = new SortField(field, type, descending);
+       	sorter.setSort(sortField, SortField.FIELD_SCORE);
+    	
+    	
+    	TopFieldDocs docs = searcher2.search(query, 75, sorter);
+    	ScoreDoc[] scoreDocs2 = docs.scoreDocs;
     	
     	System.out.println(scoreDocs2.length);
-    	
     	for (int j=0; j<scoreDocs2.length; j++){
     		int docId = scoreDocs2[j].doc;
     		Document d = searcher2.doc(docId);
-    		results[j][0]=d.get("id");
+    		
+    		results[j][0]= d.get("id");
 			results[j][1]= d.get("name");
 			results[j][2]= d.get("attending_count");
 			results[j][3]= d.get("start_time");
-			results[j][4]= d.get("location");
+			results[j][4]= d.get("invited_count");
+			results[j][5]= d.get("description");
     		
     	}
     	
+
 		
 //		for (int j=0; j < hits.length; j++) {
 //			
@@ -195,19 +227,19 @@ public class HelloLuceneSimon implements Comparable {
 //			
 //		}
 
-		System.out.println("yep");
+		
 		return results;
     	
 
     	
     }  
     
-    public Integer[][] countDailyEvents(String[] input2, String dateTo, String dateFrom) throws IOException, org.apache.lucene.queryparser.classic.ParseException{
+    public Integer[][] countDailyEvents(String[] input, String[] input2, String dateTo, String dateFrom) throws IOException, org.apache.lucene.queryparser.classic.ParseException{
     	
  	   
     	// the "title" arg specifies the default field to use
     	// when no field is explicitly specified in the query.
-    	String querystr = input2.length > 0 ? input2[0] : "lucene";
+    	
     	String date = dateFrom;
     	//city
 
@@ -216,15 +248,28 @@ public class HelloLuceneSimon implements Comparable {
     	
     	for(int i=0; i<dateEventCount.length; i++){
     		dateEventCount[i][1]=0;
+    		
     	}
-    	
+    	dateEventCount[0][3]=0;
     	int dateToConverted = Integer.parseInt(dateTo)%20150000;
        	int dateFromConverted = Integer.parseInt(dateFrom)%20150000;
     	String[] months = {"31","29","31","30","31","30","31","31","30","31","30","31"};
     	
     	int days = 0;
+    	int counter=0;
+    
     	for(int i2=dateFromConverted; i2<=dateToConverted; i2++){
-    		 String[] fields = {"location","start_time"};
+    		
+    			
+    		 String[] fields = new String[2];
+    		 fields[0]="location";
+    		 fields[1]="start_time";
+    		 
+    		 String[] fields2 = new String[3];
+    		 fields2[0]="location";
+    		 fields2[1]="description";
+    		 fields2[2]="start_time";
+    		 
     	   	 BooleanClause.Occur[] flags = {BooleanClause.Occur.MUST,
     	                BooleanClause.Occur.MUST};
     	   	
@@ -235,15 +280,30 @@ public class HelloLuceneSimon implements Comparable {
     	    	TopScoreDocCollector collector = TopScoreDocCollector.create(hitsPerPage, true);
     		
     		String date22 = Integer.toString((i2+20150000));
-    		Query q = MultiFieldQueryParser.parse(new String[] {input2[0],date22}, fields, flags, analyzer);
+    		Query q = MultiFieldQueryParser.parse(new String[] {input[0],date22}, fields, flags, analyzer);
         	
         	searcher.search(q, collector);
-           	
+        	BooleanClause.Occur[] flags2 = {BooleanClause.Occur.MUST,
+	                BooleanClause.Occur.MUST,
+	                BooleanClause.Occur.MUST};
+        	
+    		Query q2 = MultiFieldQueryParser.parse(new String[] {input[0],input2[0],date22}, fields2, flags2, analyzer);
+    		
+    		IndexReader reader2 = DirectoryReader.open(this.index);
+	    	IndexSearcher searcher2 = new IndexSearcher(reader2);
+	    	
+	    	TopScoreDocCollector collector2 = TopScoreDocCollector.create(hitsPerPage, true);
+    		searcher.search(q2, collector2);
+        	
         	ScoreDoc[] scoreDocs = collector.topDocs().scoreDocs;
     		dateEventCount[days][0]=(i2+20150000);
     		dateEventCount[days][1]=scoreDocs.length;
+    			
     		
-    		
+    		ScoreDoc[] scoreDocs2 = collector2.topDocs().scoreDocs;
+    		int inter= scoreDocs2.length;
+    		int oldc = counter;
+    		counter=inter+oldc;
     		
     		
     		int operator = i2%1000;
@@ -264,6 +324,7 @@ public class HelloLuceneSimon implements Comparable {
     		days++;
     		
     	}
+    	System.out.println("Number of events in the timeframe with 2 searchwords "+ counter);
        	
        	
     	
@@ -309,12 +370,8 @@ public class HelloLuceneSimon implements Comparable {
 //			
 //		}
 		
-		for(int j=0; j< days;j++){
-			
-			System.out.println(dateEventCount[j][0]+" "+ dateEventCount[j][1]);
-			
-			
-		}
+		
+		
 		return dateEventCount;
 		
 		

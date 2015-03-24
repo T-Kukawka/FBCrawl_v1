@@ -27,7 +27,7 @@ import facebook4j.FacebookException;
     	JButton jbnButton1, jbnButton2, jbnButton3, jbnButton4, jbnButton5;
     	JTextField jtfInput, jtfInput2; 
     	Integer[][] eventCount = new Integer[100][100];
-    	Integer[][] shortCount = new Integer[100][100];
+    	String[][] shortCount = new String[100][100];
     	JLabel Search1, DatePicker;
 		JLabel results, search2, results2;
     	
@@ -44,7 +44,7 @@ import facebook4j.FacebookException;
     	public JButtonDemo2(final fbCrawl fbCrawl) throws IOException, ParseException {
         		
         	jtfMainFrame = new JFrame("Which Button Demo"); 
-        	jtfMainFrame.setSize(300,300);
+        	jtfMainFrame.setSize(300,400);
     		jbnButton1 = new JButton("Read IDs"); 
     		jbnButton2 = new JButton("Read events");
     		jbnButton3 = new JButton("search");
@@ -148,8 +148,8 @@ import facebook4j.FacebookException;
             		
                 	
                 	index = 0;
-            		String date = Integer.toString(shortCount[List.getSelectedIndex()][0]);
-            		System.out.println(date);
+            		String date = Integer.toString(eventCount[List.getSelectedIndex()][0]);
+            		
             		
             		
             		try {
@@ -163,29 +163,61 @@ import facebook4j.FacebookException;
             		int i=0;
             		try{
 	            		while(allEvents[i][0]!=null){
-	            			sortedEvents[i][0]=allEvents[i][0];
-	            			sortedEvents[i][1]=allEvents[i][1];
+	            			if(allEvents[i][0].length()>20){
+	            			sortedEvents[i][0]=(String) allEvents[i][0].subSequence(0, 20);
+	            			}else{
+	            				sortedEvents[i][0]=allEvents[i][0];
+	            			}
+	            			if(allEvents[i][1].length()>20){
+		            			sortedEvents[i][1]=(String) allEvents[i][1].subSequence(0, 20);
+		            			}else{
+		            				sortedEvents[i][1]=allEvents[i][1];
+		            			}
+	            			if(allEvents[i][2].length()>20){
+		            			sortedEvents[i][2]=(String) allEvents[i][2].subSequence(0, 20);
+		            			}else{
+		            				sortedEvents[i][2]=allEvents[i][2];
+		            			}
+	            			if(allEvents[i][3].length()>20){
+		            			sortedEvents[i][3]=(String) allEvents[i][3].subSequence(0, 20);
+		            			}else{
+		            				sortedEvents[i][3]=allEvents[i][3];
+		            			}
+	            			if(allEvents[i][4].length()>20){
+		            			sortedEvents[i][4]=(String) allEvents[i][4].subSequence(0, 20);
+		            			}else{
+		            				sortedEvents[i][4]=allEvents[i][4];
+		            			}
+	            			if(allEvents[i][5].length()>100){
+		            			sortedEvents[i][5]=(String) allEvents[i][5].subSequence(0, 100);
+		            			}else{
+		            				sortedEvents[i][5]=allEvents[i][5];
+		            			}
 	            			i++;
 	            		}
+	            		
             		}catch(ArrayIndexOutOfBoundsException e2)
             		{
             			
-            		}            		
+            		} 
             		index=i;
             		List2.setModel(new javax.swing.AbstractListModel() {
             			  public int getSize() { 
             				  return (index); }
             			  
                         public Object getElementAt(int i) { 
-                      	  return sortedEvents[i][0]+" "+sortedEvents[i][1]; 
+                      	  return sortedEvents[i][1]+"...  || "+sortedEvents[i][2]+" || "+sortedEvents[i][4]+" || "+sortedEvents[i][5]; 
                         	}
                     });
+            		
+            		
             	}
             });
             
             jbnButton4.addActionListener(new ActionListener() {
             	public void actionPerformed(ActionEvent e) {
 					String search_term = jtfInput.getText();
+					String search_term2 = jtfInput2.getText();
 					String dateTo= null;  
 					String dateFrom = null;
 					Date selectedDateFrom = (Date) datePickerFrom.getModel().getValue();
@@ -210,18 +242,16 @@ import facebook4j.FacebookException;
 					}
 					
 					
-					
-					
-					System.out.println(dateFrom+" "+ dateTo);
-	            	System.out.println(selectedDateFrom+" "+ selectedDateTo);
+				
             		try {
-            			eventCount = fbCrawl.countDailyEvents(search_term, dateTo, dateFrom);
+            			eventCount = fbCrawl.countDailyEvents(search_term,search_term2, dateTo, dateFrom);
             			
             			try{
             				
             			while(eventCount[i5][0]!=null){
-            				shortCount[i5][0]=eventCount[i5][0];
-            				shortCount[i5][1]=eventCount[i5][1];
+            				int count = eventCount[i5][0];
+            				shortCount[i5][0]=Integer.toString(count/10000)+"-"+Integer.toString((count%20150000)/100)+"-"+Integer.toString((count%20150000)%100);
+            				shortCount[i5][1]=Integer.toString(eventCount[i5][1]);
             				i5++;
             			}
             			}catch(NullPointerException e1){
@@ -246,16 +276,19 @@ import facebook4j.FacebookException;
             });
             
             List.addMouseListener(new MouseAdapter() {
-            	String search_term = jtfInput.getText();
-            	int index;
+           
+      	
+            	int index=0;
                 public void mouseClicked(MouseEvent evt) {
                 	
                     JList list = (JList)evt.getSource();
                     if (evt.getClickCount() == 2) {
-
+                    	String search_term2 = jtfInput2.getText();
+                    	String search_term = jtfInput.getText();
+                    	System.out.println(search_term+search_term2);
                         // Double-click detected
                         
-                		String date = Integer.toString(shortCount[List.getSelectedIndex()][0]);
+                		String date = Integer.toString(eventCount[List.getSelectedIndex()][0]);
 
                         
                         	
@@ -277,21 +310,51 @@ import facebook4j.FacebookException;
                         	int i=0;
                     		try{
         	            		while(allEvents[i][0]!=null){
-        	            			sortedEvents[i][0]=allEvents[i][0];
-        	            			sortedEvents[i][1]=allEvents[i][1];
+        	            			if(allEvents[i][0].length()>20){
+        	            			sortedEvents[i][0]=(String) allEvents[i][0].subSequence(0, 20);
+        	            			}else{
+        	            				sortedEvents[i][0]=allEvents[i][0];
+        	            			}
+        	            			if(allEvents[i][1].length()>20){
+        		            			sortedEvents[i][1]=(String) allEvents[i][1].subSequence(0, 20);
+        		            			}else{
+        		            				sortedEvents[i][1]=allEvents[i][1];
+        		            			}
+        	            			if(allEvents[i][2].length()>20){
+        		            			sortedEvents[i][2]=(String) allEvents[i][2].subSequence(0, 20);
+        		            			}else{
+        		            				sortedEvents[i][2]=allEvents[i][2];
+        		            			}
+        	            			if(allEvents[i][3].length()>20){
+        		            			sortedEvents[i][3]=(String) allEvents[i][3].subSequence(0, 20);
+        		            			}else{
+        		            				sortedEvents[i][3]=allEvents[i][3];
+        		            			}
+        	            			if(allEvents[i][4].length()>20){
+        		            			sortedEvents[i][4]=(String) allEvents[i][4].subSequence(0, 20);
+        		            			}else{
+        		            				sortedEvents[i][4]=allEvents[i][4];
+        		            			}
+        	            			if(allEvents[i][5].length()>100){
+        		            			sortedEvents[i][5]=(String) allEvents[i][5].subSequence(0, 100);
+        		            			}else{
+        		            				sortedEvents[i][5]=allEvents[i][5];
+        		            			}
         	            			i++;
         	            		}
+        	            		
                     		}catch(ArrayIndexOutOfBoundsException e2)
                     		{
                     			
-                    		}            		
+                    		} 
                     		index=i;
+                    		
                     		List2.setModel(new javax.swing.AbstractListModel() {
                     			  public int getSize() { 
                     				  return (index); }
                     			  
                                 public Object getElementAt(int i) { 
-                              	  return sortedEvents[i][0]+" "+sortedEvents[i][1]; 
+                              	  return sortedEvents[i][1]+"...  || "+sortedEvents[i][2]+" || "+sortedEvents[i][4]+" || "+sortedEvents[i][5]; 
                                 	}
                             });
                         	
@@ -304,6 +367,7 @@ import facebook4j.FacebookException;
                         // Triple-click detected
                         int index = list.locationToIndex(evt.getPoint());
                     }
+                    
                 }
             });
 
@@ -316,12 +380,16 @@ import facebook4j.FacebookException;
             
             
             results = new JLabel("Pick up date to see all events", SwingConstants.CENTER);
-            
+            JLabel results4 = new JLabel("Date || Number of events", SwingConstants.LEFT);
+            results4.setFont(new Font("Serif", Font.PLAIN, 12));
             
             search2 = new JLabel("Search for events in picked up date", SwingConstants.CENTER);
             
             
             results2 = new JLabel("List of events", SwingConstants.CENTER);
+            JLabel results3 = new JLabel("Name || Attending PPL || Invited PPL || Description", SwingConstants.LEFT);
+            results3.setFont(new Font("Serif", Font.PLAIN, 12));
+            
             
             
     		//jplPanel.setLayout(new BoxLayout(jplPanel, FlowLayout.CENTER));
@@ -337,27 +405,35 @@ import facebook4j.FacebookException;
     		jplPanel.add(jbnButton1); 
     		jplPanel.add(jbnButton2);
     		
+    		
+    		
+    		jplPanel.add(DatePicker);
+    		jplPanel.add(datePickerFrom);
+    		jplPanel.add(datePickerTo);
     		jplPanel.add(jbnButton4);
     		
-    		jplPanel2.add(DatePicker);
-    		jplPanel2.add(datePickerFrom);
-    		jplPanel2.add(datePickerTo);
-    		
-    		jplPanel2.add(results);
-    		jplPanel25.add(ScrollPane);
 
     		jplPanel3.add(search2); 
     		jplPanel3.add(jtfInput2);
     		jplPanel3.add(jbnButton3);
     		
-    		jplPanel3.add(results2);
+    		jplPanel25.add(results);
+    		jplPanel25.add(results4);
+    		
+    		jplPanel25.add(ScrollPane);
+    		jplPanel4.add(results2);
+    		jplPanel4.add(results3);
     		jplPanel4.add(ScrollPane2);
+    		
+    		jplPanel25.setPreferredSize(new Dimension(50, 30));
+    		
+    		jplPanel4.setPreferredSize(new Dimension(300, 300));
         		
-    		jtfMainFrame.setLayout(new GridLayout(0,1));
+    		jtfMainFrame.setLayout(new GridLayout(2,2));
         	jtfMainFrame.getContentPane().add(jplPanel);
-        	jtfMainFrame.getContentPane().add(jplPanel2);
-        	jtfMainFrame.getContentPane().add(jplPanel25);
+        	
         	jtfMainFrame.getContentPane().add(jplPanel3);
+        	jtfMainFrame.getContentPane().add(jplPanel25);
         	jtfMainFrame.getContentPane().add(jplPanel4);
 
         	jtfMainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); 
